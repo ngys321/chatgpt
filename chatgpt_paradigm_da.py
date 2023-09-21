@@ -486,23 +486,18 @@ if __name__ == '__main__':
 
 
 
-    # cosqa
-
+    # Process the cosqa dataset
     in_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa.json'
     out_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_DAOUTPUT.json' # <- DAOUTPUT 부분만 이름 고쳐서 쓰면 됨.
     chatgpt_paradigm_da(in_cosqa, out_cosqa, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
-    # remove_hereisthecode_sorry
-    remove_hereisthecode_sorry(out_cosqa, out_cosqa)
-    # xlcost2cosqa: format 변경. cosqa 만 해줌. xlcost는 안해줌.
-    xlcost2cosqa(out_cosqa, out_cosqa)
+    remove_hereisthecode_sorry(out_cosqa, out_cosqa) # remove_hereisthecode_sorry
+    xlcost2cosqa(out_cosqa, out_cosqa) # xlcost2cosqa: format 변경. cosqa 만 해줌. xlcost는 안해줌.
 
-    # xlcost
-
+    # Process the xlcost dataset
     in_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost.jsonl'
     out_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_DAOUTPUT.jsonl' # <- DAOUTPUT 부분만 이름 고쳐서 쓰면 됨.
     chatgpt_paradigm_da(in_xlcost, out_xlcost, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
-    # remove_hereisthecode_sorry
-    remove_hereisthecode_sorry(out_xlcost, out_xlcost)
+    remove_hereisthecode_sorry(out_xlcost, out_xlcost) # remove_hereisthecode_sorry
 
 
 # <command examples>
