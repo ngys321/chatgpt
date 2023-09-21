@@ -190,24 +190,24 @@ def chatgpt_paradigm_da(input_file_path, output_file_path, do_spt=False, do_sro=
                 # paradigm classification
                 src_p, score = RuleBasedParadigmClassifier(code)
 
-                # # paradigm translation
-                # if src_p == "imperative" or src_p == "functional": # src_p가 hybrid 인 경우는 제외
-                #     tgt_p = paradigm_flipper(src_p)
-                #     if do_spt:
-                #         code_w_spt = ChatgptParadigmTranslator(code, src_p, tgt_p)
-                #     else:
-                #         code_wo_spt = ChatgptParadigmTranslator(code, None, tgt_p)
+                # paradigm translation
+                if do_spt and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
+                    tgt_p = paradigm_flipper(src_p)
+                    if do_spt:
+                        code_w_spt = ChatgptParadigmTranslator(code, src_p, tgt_p)
+                    else:
+                        code_wo_spt = ChatgptParadigmTranslator(code, None, tgt_p)
 
-                # # paradigm translation with statement random ordering(sro)
-                # if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
-                #     shuffled_code = statement_random_ordering(code)
-                #     tgt_p = paradigm_flipper(src_p)
-                #     if do_spt:
-                #         code_w_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, src_p, tgt_p)
-                #     else:
-                #         code_wo_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, None, tgt_p)
+                # paradigm translation with statement random ordering(sro)
+                if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
+                    shuffled_code = statement_random_ordering(code)
+                    tgt_p = paradigm_flipper(src_p)
+                    if do_spt:
+                        code_w_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, src_p, tgt_p)
+                    else:
+                        code_wo_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, None, tgt_p)
 
-                ##############################################################
+                
                 # paradigm translation with statement random masking(srm)
                 if do_srm and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
                     masked_code = statement_random_masking(code)
@@ -217,77 +217,77 @@ def chatgpt_paradigm_da(input_file_path, output_file_path, do_spt=False, do_sro=
                     else:
                         code_wo_spt_w_srm = ChatgptParadigmTranslator(masked_code, None, tgt_p)
                 
-                ##############################################################
+                
 
-                # # add original data
-                # new_data = {}
-                # new_data["idx"] = data["idx"]
-                # new_data["docstring_tokens"] = data["docstring_tokens"]
-                # new_data["code_tokens"] = data["code_tokens"]
-                # new_data['url'] = str(data['idx']) + "-Python"
-                # f.write(json.dumps(new_data) + "\n")
+                # add original data
+                new_data = {}
+                new_data["idx"] = data["idx"]
+                new_data["docstring_tokens"] = data["docstring_tokens"]
+                new_data["code_tokens"] = data["code_tokens"]
+                new_data['url'] = str(data['idx']) + "-Python"
+                f.write(json.dumps(new_data) + "\n")
 
-                # # add augmented data
-                # if src_p == "imperative" or src_p == "functional": # src_p가 hybrid 인 경우는 제외
-                #     new_data = {}
-                #     new_data["idx"] = max_idx + data["idx"]
-                #     new_data["docstring_tokens"] = data["docstring_tokens"]
-                #     if do_spt:
-                #         # new_data["code_tokens"] = codeStr2codeToken(code_w_spt) # <- 에러발생 위험. 가끔 code_w_spt가 parse되지 않는 경우가 있음.
-                #         try:
-                #             new_data["code_tokens"] = codeStr2codeToken(code_w_spt)
-                #         except:
-                #             new_data["code_tokens"] = code_w_spt.split()
-                #                                                                 # try except로 처리할까?
-                #                                                                 # try:
-                #                                                                 #    new_data["code_tokens"] = codeStr2codeToken(code_w_spt)
-                #                                                                 # except:
-                #                                                                 #    new_data["code_tokens"] = code_w_spt.split()
-                #     else:
-                #         # new_data["code_tokens"] = codeStr2codeToken(code_wo_spt) # <- 에러발생 위험. 가끔 code_wo_spt가 parse되지 않는 경우가 있음.
-                #         try:
-                #             new_data["code_tokens"] = codeStr2codeToken(code_wo_spt)
-                #         except:
-                #             new_data["code_tokens"] = code_wo_spt.split()
-                #                                                                 # try except로 처리할까?
-                #                                                                 # try:
-                #                                                                 #    new_data["code_tokens"] = codeStr2codeToken(code_w_spt)
-                #                                                                 # except:
-                #                                                                 #    new_data["code_tokens"] = code_wo_spt.split()
-                #     new_data['url'] = str(max_idx + data["idx"]) + "-Python"
-                #     f.write(json.dumps(new_data) + "\n")
+                # add augmented data
+                if do_spt and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
+                    new_data = {}
+                    new_data["idx"] = max_idx + data["idx"]
+                    new_data["docstring_tokens"] = data["docstring_tokens"]
+                    if do_spt:
+                        # new_data["code_tokens"] = codeStr2codeToken(code_w_spt) # <- 에러발생 위험. 가끔 code_w_spt가 parse되지 않는 경우가 있음.
+                        try:
+                            new_data["code_tokens"] = codeStr2codeToken(code_w_spt)
+                        except:
+                            new_data["code_tokens"] = code_w_spt.split()
+                                                                                # try except로 처리할까?
+                                                                                # try:
+                                                                                #    new_data["code_tokens"] = codeStr2codeToken(code_w_spt)
+                                                                                # except:
+                                                                                #    new_data["code_tokens"] = code_w_spt.split()
+                    else:
+                        # new_data["code_tokens"] = codeStr2codeToken(code_wo_spt) # <- 에러발생 위험. 가끔 code_wo_spt가 parse되지 않는 경우가 있음.
+                        try:
+                            new_data["code_tokens"] = codeStr2codeToken(code_wo_spt)
+                        except:
+                            new_data["code_tokens"] = code_wo_spt.split()
+                                                                                # try except로 처리할까?
+                                                                                # try:
+                                                                                #    new_data["code_tokens"] = codeStr2codeToken(code_w_spt)
+                                                                                # except:
+                                                                                #    new_data["code_tokens"] = code_wo_spt.split()
+                    new_data['url'] = str(max_idx + data["idx"]) + "-Python"
+                    f.write(json.dumps(new_data) + "\n")
 
-                # # add augmented data with statement random ordering(sro)
-                # if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
-                #     new_data = {}
-                #     new_data["idx"] = 2 * max_idx + data["idx"]
-                #     new_data["docstring_tokens"] = data["docstring_tokens"]
-                #     if do_spt:
-                #         # new_data["code_tokens"] = codeStr2codeToken(code_w_spt_w_sro) # <- 에러발생 위험. 가끔 code_w_spt_w_sro가 parse되지 않는 경우가 있음.
-                #         try:
-                #             new_data["code_tokens"] = codeStr2codeToken(code_w_spt_w_sro)
-                #         except:
-                #             new_data["code_tokens"] = code_w_spt_w_sro.split()
-                #                                                                 # try except로 처리할까?
-                #                                                                 # try:
-                #                                                                 #    new_data["code_tokens"] = codeStr2codeToken(code_w_spt_w_sro)
-                #                                                                 # except:
-                #                                                                 #    new_data["code_tokens"] = code_w_spt_w_sro.split()
-                #     else:
-                #         # new_data["code_tokens"] = codeStr2codeToken(code_wo_spt_w_sro) # <- 에러발생 위험. 가끔 code_wo_spt_w_sro가 parse되지 않는 경우가 있음.
-                #         try:
-                #             new_data["code_tokens"] = codeStr2codeToken(code_wo_spt_w_sro)
-                #         except:
-                #             new_data["code_tokens"] = code_wo_spt_w_sro.split()
-                #                                                                 # try except로 처리할까?
-                #                                                                 # try:
-                #                                                                 #    new_data["code_tokens"] = codeStr2codeToken(code_wo_spt_w_sro)
-                #                                                                 # except:
-                #                                                                 #    new_data["code_tokens"] = code_wo_spt_w_sro.split()
-                #     new_data['url'] = str(2 * max_idx + data["idx"]) + "-Python"
-                #     f.write(json.dumps(new_data) + "\n")
+                # add augmented data with statement random ordering(sro)
+                if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
+                    new_data = {}
+                    new_data["idx"] = 2 * max_idx + data["idx"]
+                    new_data["docstring_tokens"] = data["docstring_tokens"]
+                    if do_spt:
+                        # new_data["code_tokens"] = codeStr2codeToken(code_w_spt_w_sro) # <- 에러발생 위험. 가끔 code_w_spt_w_sro가 parse되지 않는 경우가 있음.
+                        try:
+                            new_data["code_tokens"] = codeStr2codeToken(code_w_spt_w_sro)
+                        except:
+                            new_data["code_tokens"] = code_w_spt_w_sro.split()
+                                                                                # try except로 처리할까?
+                                                                                # try:
+                                                                                #    new_data["code_tokens"] = codeStr2codeToken(code_w_spt_w_sro)
+                                                                                # except:
+                                                                                #    new_data["code_tokens"] = code_w_spt_w_sro.split()
+                    else:
+                        # new_data["code_tokens"] = codeStr2codeToken(code_wo_spt_w_sro) # <- 에러발생 위험. 가끔 code_wo_spt_w_sro가 parse되지 않는 경우가 있음.
+                        try:
+                            new_data["code_tokens"] = codeStr2codeToken(code_wo_spt_w_sro)
+                        except:
+                            new_data["code_tokens"] = code_wo_spt_w_sro.split()
+                                                                                # try except로 처리할까?
+                                                                                # try:
+                                                                                #    new_data["code_tokens"] = codeStr2codeToken(code_wo_spt_w_sro)
+                                                                                # except:
+                                                                                #    new_data["code_tokens"] = code_wo_spt_w_sro.split()
+                    new_data['url'] = str(2 * max_idx + data["idx"]) + "-Python"
+                    f.write(json.dumps(new_data) + "\n")
 
-                ##############################################################
+                
                 # add augmented data with statement random masking(srm)
                 if do_srm and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
                     new_data = {}
@@ -318,7 +318,7 @@ def chatgpt_paradigm_da(input_file_path, output_file_path, do_spt=False, do_sro=
                     new_data['url'] = str(3 * max_idx + data["idx"]) + "-Python"
                     f.write(json.dumps(new_data) + "\n")
 
-                ##############################################################
+                
 
     # json file. e.g. cosqa.json
     elif input_file_path.split(".")[-1] == "json":
@@ -343,24 +343,24 @@ def chatgpt_paradigm_da(input_file_path, output_file_path, do_spt=False, do_sro=
                 # paradigm classification
                 src_p, score = RuleBasedParadigmClassifier(code)
 
-                # # paradigm translation
-                # if src_p == "imperative" or src_p == "functional":
-                #     tgt_p = paradigm_flipper(src_p)
-                #     if do_spt:
-                #         code_w_spt = ChatgptParadigmTranslator(code, src_p, tgt_p)
-                #     else:
-                #         code_wo_spt = ChatgptParadigmTranslator(code, None, tgt_p)
+                # paradigm translation
+                if do_spt and (src_p == "imperative" or src_p == "functional"):
+                    tgt_p = paradigm_flipper(src_p)
+                    if do_spt:
+                        code_w_spt = ChatgptParadigmTranslator(code, src_p, tgt_p)
+                    else:
+                        code_wo_spt = ChatgptParadigmTranslator(code, None, tgt_p)
         
-                # # paradigm translation with statement random ordering(sro)
-                # if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
-                #     shuffled_code = statement_random_ordering(code)
-                #     tgt_p = paradigm_flipper(src_p)
-                #     if do_spt:
-                #         code_w_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, src_p, tgt_p)
-                #     else:
-                #         code_wo_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, None, tgt_p)
+                # paradigm translation with statement random ordering(sro)
+                if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
+                    shuffled_code = statement_random_ordering(code)
+                    tgt_p = paradigm_flipper(src_p)
+                    if do_spt:
+                        code_w_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, src_p, tgt_p)
+                    else:
+                        code_wo_spt_w_sro = ChatgptParadigmTranslator(shuffled_code, None, tgt_p)
 
-                ##############################################################
+                
                 # paradigm translation with statement random masking(srm)
                 if do_srm and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
                     masked_code = statement_random_masking(code)
@@ -369,47 +369,47 @@ def chatgpt_paradigm_da(input_file_path, output_file_path, do_spt=False, do_sro=
                         code_w_spt_w_srm = ChatgptParadigmTranslator(masked_code, src_p, tgt_p)
                     else:
                         code_wo_spt_w_srm = ChatgptParadigmTranslator(masked_code, None, tgt_p)
-                ##############################################################
+                
 
-                # # add original data
-                # new_data = {}
-                # new_data["idx"] = d["idx"]
-                # new_data['doc'] = d['doc']
-                # new_data["code_tokens"] = d["code_tokens"]
-                # new_data["docstring_tokens"] = d["docstring_tokens"]
-                # new_data["label"] = d["label"]
-                # new_data['retrieval_idx'] = int(d["idx"].split("-")[-1])
-                # f.write(json.dumps(new_data) + "\n")
+                # add original data
+                new_data = {}
+                new_data["idx"] = d["idx"]
+                new_data['doc'] = d['doc']
+                new_data["code_tokens"] = d["code_tokens"]
+                new_data["docstring_tokens"] = d["docstring_tokens"]
+                new_data["label"] = d["label"]
+                new_data['retrieval_idx'] = int(d["idx"].split("-")[-1])
+                f.write(json.dumps(new_data) + "\n")
 
-                # # add augmented data
-                # if src_p == "imperative" or src_p == "functional":
-                #     new_data = {}
-                #     new_data["idx"] = "cosqa-train-"+str(int(max_idx) + int(d["idx"].split("-")[-1]))
-                #     new_data['doc'] = d['doc']
-                #     if do_spt:
-                #         new_data["code_tokens"] = code_w_spt
-                #     else:
-                #         new_data["code_tokens"] = code_wo_spt
-                #     new_data["docstring_tokens"] = d["docstring_tokens"]
-                #     new_data["label"] = d["label"]
-                #     new_data['retrieval_idx'] = int(max_idx) + int(d["idx"].split("-")[-1])
-                #     f.write(json.dumps(new_data) + "\n")
+                # add augmented data
+                if do_spt and (src_p == "imperative" or src_p == "functional"):
+                    new_data = {}
+                    new_data["idx"] = "cosqa-train-"+str(int(max_idx) + int(d["idx"].split("-")[-1]))
+                    new_data['doc'] = d['doc']
+                    if do_spt:
+                        new_data["code_tokens"] = code_w_spt
+                    else:
+                        new_data["code_tokens"] = code_wo_spt
+                    new_data["docstring_tokens"] = d["docstring_tokens"]
+                    new_data["label"] = d["label"]
+                    new_data['retrieval_idx'] = int(max_idx) + int(d["idx"].split("-")[-1])
+                    f.write(json.dumps(new_data) + "\n")
 
-                # # add augmented data with statement random ordering(sro)
-                # if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
-                #     new_data = {}
-                #     new_data["idx"] = "cosqa-train-"+str(int(2 * max_idx) + int(d["idx"].split("-")[-1]))
-                #     new_data['doc'] = d['doc']
-                #     if do_spt:
-                #         new_data["code_tokens"] = code_w_spt_w_sro
-                #     else:
-                #         new_data["code_tokens"] = code_wo_spt_w_sro
-                #     new_data["docstring_tokens"] = d["docstring_tokens"]
-                #     new_data["label"] = d["label"]
-                #     new_data['retrieval_idx'] = int(2 * max_idx) + int(d["idx"].split("-")[-1])
-                #     f.write(json.dumps(new_data) + "\n")
+                # add augmented data with statement random ordering(sro)
+                if do_sro and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
+                    new_data = {}
+                    new_data["idx"] = "cosqa-train-"+str(int(2 * max_idx) + int(d["idx"].split("-")[-1]))
+                    new_data['doc'] = d['doc']
+                    if do_spt:
+                        new_data["code_tokens"] = code_w_spt_w_sro
+                    else:
+                        new_data["code_tokens"] = code_wo_spt_w_sro
+                    new_data["docstring_tokens"] = d["docstring_tokens"]
+                    new_data["label"] = d["label"]
+                    new_data['retrieval_idx'] = int(2 * max_idx) + int(d["idx"].split("-")[-1])
+                    f.write(json.dumps(new_data) + "\n")
 
-                ##############################################################
+                
                 # add augmented data with statement random masking(srm)
                 if do_srm and (src_p == "imperative" or src_p == "functional"): # src_p가 hybrid 인 경우는 제외
                     new_data = {}
@@ -423,7 +423,7 @@ def chatgpt_paradigm_da(input_file_path, output_file_path, do_spt=False, do_sro=
                     new_data["label"] = d["label"]
                     new_data['retrieval_idx'] = int(3 * max_idx) + int(d["idx"].split("-")[-1])
                     f.write(json.dumps(new_data) + "\n")
-                ##############################################################
+                
 
 if __name__ == '__main__':
 
@@ -485,53 +485,39 @@ if __name__ == '__main__':
     #     xlcost2cosqa(input_file_path, output_file_path)
 
 
-    # # --do_spt --do_srm 했을때
-    # if args.do_spt and args.do_srm:
-    #     # data augmentation
-    #     in_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa.json'
-    #     out_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_spt_srm_.json'
-    #     chatgpt_paradigm_da(in_cosqa, out_cosqa, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
-    #     in_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost.jsonl'
-    #     out_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_da_spt_srm.jsonl'
-    #     chatgpt_paradigm_da(in_xlcost, out_xlcost, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
-    #     # remove_hereisthecode_sorry
-    #     input_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_spt_srm_.json'
-    #     output_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_spt_srm_.json'
-    #     remove_hereisthecode_sorry(input_file_path, output_file_path)
-    #     input_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_da_spt_srm.jsonl'
-    #     output_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_da_spt_srm.jsonl'
-    #     remove_hereisthecode_sorry(input_file_path, output_file_path)
-    #     # xlcost2cosqa: format 변경. cosqa 만 해줌. xlcost는 안해줌.
-    #     input_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_spt_srm_.json'
-    #     output_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_spt_srm.json'
-    #     xlcost2cosqa(input_file_path, output_file_path)
 
-    if args.do_spt and args.do_srm:
-        # data augmentation
-        # in_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa.json'
-        # out_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_srm_.json'
-        # chatgpt_paradigm_da(in_cosqa, out_cosqa, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
-        in_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_cut_from_4132.jsonl'
-        out_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_da_srm.jsonl'
-        chatgpt_paradigm_da(in_xlcost, out_xlcost, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
-        
-        # 후처리는 쪼개진 데이터 합치고 나서 하자
-        
-        # # remove_hereisthecode_sorry
-        # input_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_srm_.json'
-        # output_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_srm_.json'
-        # remove_hereisthecode_sorry(input_file_path, output_file_path)
-        # input_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_da_srm.jsonl'
-        # output_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_da_srm.jsonl'
-        # remove_hereisthecode_sorry(input_file_path, output_file_path)
-        # # xlcost2cosqa: format 변경. cosqa 만 해줌. xlcost는 안해줌.
-        # input_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_srm_.json'
-        # output_file_path = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_da_srm.json'
-        # xlcost2cosqa(input_file_path, output_file_path)
+    # cosqa
+
+    in_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa.json'
+    out_cosqa = '/home/ysnamgoong42/ws/chatgpt/dataset/cosqa_DAOUTPUT.json' # <- DAOUTPUT 부분만 이름 고쳐서 쓰면 됨.
+    chatgpt_paradigm_da(in_cosqa, out_cosqa, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
+    # remove_hereisthecode_sorry
+    remove_hereisthecode_sorry(out_cosqa, out_cosqa)
+    # xlcost2cosqa: format 변경. cosqa 만 해줌. xlcost는 안해줌.
+    xlcost2cosqa(out_cosqa, out_cosqa)
+
+    # xlcost
+
+    in_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost.jsonl'
+    out_xlcost = '/home/ysnamgoong42/ws/chatgpt/dataset/xlcost_DAOUTPUT.jsonl' # <- DAOUTPUT 부분만 이름 고쳐서 쓰면 됨.
+    chatgpt_paradigm_da(in_xlcost, out_xlcost, do_spt=args.do_spt, do_sro=args.do_sro, do_srm=args.do_srm )
+    # remove_hereisthecode_sorry
+    remove_hereisthecode_sorry(out_xlcost, out_xlcost)
+
+
+# <command examples>
 
 # python chatgpt_paradigm_da.py --do_spt
-# -> done
+
+# python chatgpt_paradigm_da.py --do_sro
+
+# python chatgpt_paradigm_da.py --do_srm
+
 # python chatgpt_paradigm_da.py --do_spt --do_sro
-# -> done
+
 # python chatgpt_paradigm_da.py --do_spt --do_srm
+
+# python chatgpt_paradigm_da.py --do_sro --do_srm
+
+# python chatgpt_paradigm_da.py --do_spt --do_sro --do_srm
 
